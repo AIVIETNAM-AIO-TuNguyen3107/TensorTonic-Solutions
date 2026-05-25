@@ -1,14 +1,14 @@
 import numpy as np
-import math
+
 def sigmoid(x):
     """
     Vectorized sigmoid function.
     """
-    # Write code here
-    def func(x):
+    def formula(x):
         if x > 0:
-            return 1 / (1 + math.e**(-x))
+            return 1 / (1 +  np.e**(-x))
         else:
-            return math.e**(x) / (1 + math.e**(x))
-    vectorize_func = np.vectorize(func)
-    return vectorize_func(x)
+            return np.e**x / (1 + np.e**x)
+
+    vectorize = np.vectorize(formula)
+    return vectorize(x)
