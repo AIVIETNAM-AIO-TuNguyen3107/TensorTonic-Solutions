@@ -6,6 +6,6 @@ def create_dataframe(data):
     """
     df = pd.DataFrame(data)
 
-    return {"data": {key: data[key] for key in df.columns}, 
+    return {"data": df.to_dict('list'), 
             "shape": [df.shape[0], df.shape[1]], 
             "columns": list(df.columns)}
