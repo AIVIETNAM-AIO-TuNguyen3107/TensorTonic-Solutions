@@ -4,11 +4,12 @@ def sigmoid(x):
     """
     Vectorized sigmoid function.
     """
-    def formula(x):
-        if x > 0:
-            return 1 / (1 +  np.e**(-x))
+    # Write code here
+    def func(val):
+        if val > 0:
+            return 1 / (1 + np.e**(-val))
         else:
-            return np.e**x / (1 + np.e**x)
+            return np.e**val / (np.e**val +1)
+    vectorized_func = np.vectorize(func)
 
-    vectorize = np.vectorize(formula)
-    return vectorize(x)
+    return vectorized_func(x)
