@@ -6,6 +6,6 @@ def row_summary(data, threshold):
     mask = arr > threshold
     return np.stack([
         mask,
-        np.where(mask.any(axis=1)[:, None], arr, 0),
-        np.where(mask.all(axis=1)[:, None], arr, 0)
+        np.where(mask.any(axis=1, keepdims=True), arr, 0),
+        np.where(mask.all(axis=1, keepdims=True), arr, 0)
     ])
