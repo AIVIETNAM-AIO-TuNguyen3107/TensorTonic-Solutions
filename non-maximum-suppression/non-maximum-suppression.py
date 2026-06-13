@@ -20,7 +20,7 @@ def nms(boxes, scores, iou_threshold):
     sorted_score = sorted(dict_scores.items(), key=lambda item: item[1], reverse=True)
     for max_index, _ in sorted_score:
         if max_index in surpressed_index:
-                continue
+            continue
         result.append(max_index)
         for i, box in enumerate(boxes):
             if i == max_index:
