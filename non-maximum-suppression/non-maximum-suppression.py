@@ -25,6 +25,8 @@ def nms(boxes, scores, iou_threshold):
         for i, box in enumerate(boxes):
             if i == max_index:
                 continue
+            if i in surpressed_index:
+                continue
             iou_score = iou(box, boxes[max_index])
             if iou_score >= iou_threshold:
                 surpressed_index.add(i)
