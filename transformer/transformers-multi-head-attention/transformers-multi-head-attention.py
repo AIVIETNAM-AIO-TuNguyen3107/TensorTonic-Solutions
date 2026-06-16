@@ -10,9 +10,33 @@ def multi_head_attention(Q: np.ndarray, K: np.ndarray, V: np.ndarray,
     """
     Compute multi-head attention.
     """
-    batch, n, d_model = Q.shape
-    d_k = d_model // num_heads
-    head_Q = (Q@W_q).reshape(batch, n, num_heads, d_k).transpose((0, 2, 1, 3))
-    head_K = (K@W_k).reshape(batch, n, num_heads, d_k).transpose((0, 2, 1, 3))
-    head_V = (V@W_v).reshape(batch, n, num_heads, d_k).transpose((0, 2, 1, 3))
-    return (softmax(head_Q@head_K.swapaxes(-1, -2)/np.sqrt(d_k))@head_V).transpose(0, 2, 1, 3).reshape(batch, n, d_model)@W_o
+    if Q.ndim == 2: # batch support
+        Q = Q[np.newaxis, ...]
+        K = K[np.newaxis, ...]
+        V = V[np.newaxis, ...]
+    
+    batch, seq, d_model = Q.shape
+    
+    # each head will get d_k dimensions, 
+    # conceptually, Wq is (d_model, d_k), 
+    # but for computation convenience, Wq is (d_model, d_model) then split into n_heads later by split_head
+    d_k = d_model // num_heads 
+    
+    def split_head(matrix:np.ndarray):
+        return matrix.reshape(
+            batch, seq, num_heads, d_k # b n h d_k
+        ).transpose(
+            (0, 2, 1, 3) # b h n d_k
+        ) 
+    
+    head_Q = split_head(Q@W_q)
+    head_K = split_head(K@W_k)
+    head_V = split_head(V@W_v) 
+    
+    # use swapaxes to transpose K to b h d_k n
+    scores = head_Q@head_K.swapaxes(-1, -2) / np.sqrt(d_k) # b h n n
+    attention = softmax(scores)@head_V # b h n n @ b h n d_k = b h n d_k
+    
+    # tranpose to b n h d_k then reshape to b n d_model
+    head_concat = attention.transpose((0, 2, 1, 3)).reshape(batch, seq, d_model) 
+    return head_concat@W_o
