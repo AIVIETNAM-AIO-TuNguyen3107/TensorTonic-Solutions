@@ -38,5 +38,5 @@ def multi_head_attention(Q: np.ndarray, K: np.ndarray, V: np.ndarray,
     attention = softmax(scores)@head_V # b h n n @ b h n d_k = b h n d_k
     
     # tranpose to b n h d_k then reshape to b n d_model
-    head_concat = attention.transpose((0, 2, 1, 3)).reshape(batch, seq, d_model) 
+    head_concat = attention.swapaxes(2, 1).reshape(batch, seq, d_model) 
     return head_concat@W_o
