@@ -5,4 +5,6 @@ def dot_product(x, y):
     Compute the dot product of two 1D arrays x and y.
     Must return a float.
     """
-    return np.array(x).dot(np.array(y))
+    x = np.array(x)
+    y = np.array(y)
+    return x @ y.T
