@@ -7,9 +7,10 @@ def cart_classify(X_train, y_train, X_test, max_depth=5, min_samples=2):
     def gini(arr):
         counts = np.unique(arr, return_counts=True)[1]
         return 1 - np.sum((counts / np.sum(counts)) ** 2)
-    def best_split(X: np.ndarray, y: np.ndarray, parent_gain: float) -> tuple[int, float]:
+    def best_split(X: np.ndarray, y: np.ndarray) -> tuple[int, float]:
         feature, current_threshold = None, None
-        last_gain = parent_gain if parent_gain else 0
+        last_gain = 0
+        GS = gini(y)
         for j in range(X.shape[-1]):
             feat_copy = np.copy(X[:, j])
             sorted_val = np.sort(np.unique(feat_copy))
@@ -29,11 +30,11 @@ def cart_classify(X_train, y_train, X_test, max_depth=5, min_samples=2):
                 if gain > last_gain:
                     last_gain = gain
                     feature, current_threshold = j, threshold
-        return feature, current_threshold, last_gain
-    def build(X, y, depth, parent_gain):
+        return feature, current_threshold
+    def build(X, y, depth):
         if gini(y) == 0 or len(y) < min_samples or depth >= max_depth:
             return {"value": Counter(y).most_common()[0][0]}
-        feature, threshold, best_gain = best_split(X, y, parent_gain)
+        feature, threshold = best_split(X, y)
         if feature is None or threshold is None:
             return {"value": Counter(y).most_common()[0][0]}
         left = X[:, feature] <= threshold
@@ -41,8 +42,8 @@ def cart_classify(X_train, y_train, X_test, max_depth=5, min_samples=2):
         return {
             "feature": feature,
             "threshold": threshold,
-            "left": build(X[left], y[left], depth+1, best_gain),
-            "right": build(X[right], y[right], depth+1, best_gain),
+            "left": build(X[left], y[left], depth+1),
+            "right": build(X[right], y[right], depth+1),
             "value": None
         }
     def predict(tree, test):
@@ -57,6 +58,5 @@ def cart_classify(X_train, y_train, X_test, max_depth=5, min_samples=2):
     y_train = np.array(y_train)
     X_test = np.array(X_test)
     # tree as nested dict with keys feature, threshold, left, right, value
-    GS = gini(y_train)
-    tree = build(X_train, y_train, 0, None)
+    tree = build(X_train, y_train, 0)
     return [predict(tree, test) for test in X_test]
