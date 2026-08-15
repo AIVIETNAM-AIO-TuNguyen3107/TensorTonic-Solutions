@@ -11,6 +11,8 @@ def cart_classify(X_train, y_train, X_test, max_depth=5, min_samples=2):
         feature, current_threshold = None, None
         last_gain = 0
         GS = gini(y)
+        if GS == 0:
+            return feature, current_threshold
         for j in range(X.shape[-1]):
             feat_copy = np.copy(X[:, j])
             sorted_val = np.sort(np.unique(feat_copy))
@@ -32,7 +34,7 @@ def cart_classify(X_train, y_train, X_test, max_depth=5, min_samples=2):
                     feature, current_threshold = j, threshold
         return feature, current_threshold
     def build(X, y, depth):
-        if gini(y) == 0 or len(y) < min_samples or depth >= max_depth:
+        if len(y) < min_samples or depth >= max_depth:
             return {"value": Counter(y).most_common()[0][0]}
         feature, threshold = best_split(X, y)
         if feature is None or threshold is None:
