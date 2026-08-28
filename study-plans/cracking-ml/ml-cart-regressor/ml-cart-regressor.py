@@ -29,13 +29,6 @@ def cart_regress(X_train, y_train, X_test, max_depth=5, min_samples=2):
                     best_feat = j
                     best_threshold = t
                     best_mse = node_mse
-                # print(
-                #     {
-                #         "feat": j,
-                #         "threshold": t,
-                #         "node_mse": node_mse
-                #     }
-                # )
         return best_feat, best_threshold
     def build_tree(X, y, depth=0):
         if len(y) < min_samples or depth >= max_depth or len(np.unique(y)) == 1:
