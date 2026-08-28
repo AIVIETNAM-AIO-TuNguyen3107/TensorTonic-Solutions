@@ -47,7 +47,7 @@ def cart_regress(X_train, y_train, X_test, max_depth=5, min_samples=2):
         }
 
     def inference(tree, test):
-        if tree["leaf"]:                              # FIX 4: was `if tree["value"]`
+        if tree["leaf"]:
             return tree["value"]
         if test[tree["feat"]] <= tree["threshold"]:
             return inference(tree["left"], test)
