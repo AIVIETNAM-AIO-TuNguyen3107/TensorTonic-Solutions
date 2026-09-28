@@ -1,18 +1,10 @@
 import numpy as np
 
-def softmax(x):
+def softmax(x: list) -> np.ndarray:
     """
-    Compute the softmax of input x.
-    Works for 1D or 2D NumPy arrays.
-    For 2D, compute row-wise softmax.
+    Returns stable softmax probabilities as a NumPy array matching the shape of x.
     """
-    np_array_x = np.array(x)
-
-    if np_array_x.ndim == 1:
-        max_x = np.max(np_array_x)
-        exp_x = np.exp(np_array_x - max_x)
-        return exp_x / np.sum(exp_x)
-    elif np_array_x.ndim >1:
-        max_x = np.max(np_array_x, axis = 1, keepdims = True)
-        exp_x = np.exp(np_array_x - max_x)
-        return exp_x / np.sum(exp_x, axis = 1, keepdims = True)
+    x = np.array(x)
+    max = np.max(x, axis=-1, keepdims=True)
+    exp_x = np.exp(x-max)
+    return exp_x / np.sum(exp_x, axis=-1, keepdims=True)
