@@ -1,24 +1,26 @@
 import numpy as np
 
-def softmax_regression(X, y, n_classes, lr=0.01, n_iters=1000):
+def softmax_regression(X: list, y: list, num_classes: int, lr: float, n_iters: int) -> tuple:
     """
-    Returns: tuple (weights, bias) where weights is a 2D list (d x K) and bias is a list of length K
+    Returns the fitted weight matrix and bias vector.
     """
-    X = np.array(X)
+    k = num_classes
     y = np.array(y)
+    y = np.eye(k)[y]
+
+    def stable_softmax(z):
+        max = np.max(z, axis=-1, keepdims=True)
+        exp_z = np.exp(z-max)
+        return exp_z / np.sum(exp_z, axis=-1, keepdims=True)
+
+    X = np.array(X)
     n, d = X.shape
-    Y = np.zeros((n, n_classes))
-    Y[np.arange(n), y] = 1
-
-    w = np.zeros((d, n_classes))
-    b = np.zeros(n_classes)
-
+    w = np.zeros((d, k))
+    b = np.zeros(k)
     for _ in range(n_iters):
-        Z = X@w + b
-        Z = Z - np.max(Z, axis=1, keepdims=True)
-        expZ = np.exp(Z)
-        P = expZ / np.sum(expZ, axis=1, keepdims=True)
-
-        w -= lr*((1/n)*X.T@(P-Y))
-        b -= lr*((1/n)*np.sum(P-Y, axis=0))
+        z = X@w + b
+        y_hat = stable_softmax(z)
+        gradient = y_hat-y
+        w -= lr*(1/n)*X.T@gradient
+        b -= lr*np.mean(gradient.T, axis=-1)
     return w, b
