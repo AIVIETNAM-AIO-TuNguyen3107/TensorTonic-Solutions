@@ -9,27 +9,22 @@ def conv2d(
     """
     input = np.array(input, dtype=np.float64)
     _, h, w = input.shape
-    if padding != 0:
-        pad_width = [(0, 0)] * input.ndim
-        pad_width[-1] = (padding, padding)
-        pad_width[-2] = (padding, padding)
-
-        input = np.pad(input, pad_width, mode="constant", constant_values=0)
-    _, h_padded, w_padded = input.shape
-    output = []
-    for filter in filters:
-        filter = np.array(filter, dtype=np.float64)
-        _, k_h, k_w = filter.shape
-        if bias is not None:
-            bias = np.array(bias, dtype=np.float64)
-        else:
-            bias = np.zeros((1))
-        for i in range(0, h_padded, stride):
-            for j in range(0, w_padded, stride):
-                if i + k_h > h_padded or j + k_w > w_padded:
-                    continue
-                output.append(
-                    np.sum(input[:, i : i + k_h, j : j + k_w] * filter) + bias
-                )
+    padded = np.pad(input, ((0, 0), (padding, padding), (padding, padding)))
+    filters = np.asarray(filters, dtype=np.float64)
+    out_channels, in_channels, k_h, k_w = filters.shape
+    bias = (
+        np.zeros((out_channels)) if bias is None else np.asarray(bias, dtype=np.float64)
+    )
     h_out = (h + 2 * padding - k_h) // stride + 1
-    return list(np.array(output).reshape((len(filters), h_out, h_out)))
+    w_out = (w + 2 * padding - k_w) // stride + 1
+    output = np.empty((out_channels, h_out, w_out))
+    for channel in range(out_channels):
+        for i in range(h_out):
+            for j in range(w_out):
+                patch = padded[
+                    :,
+                    i * stride : i * stride + k_h,
+                    j * stride : j * stride + k_w,
+                ]
+                output[channel, i, j] = np.sum(patch * filters[channel]) + bias[channel]
+    return output.round(4).tolist()
