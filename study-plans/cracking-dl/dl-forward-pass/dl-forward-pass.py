@@ -4,7 +4,6 @@ def forward_pass(x: list, weights: list, biases: list) -> dict:
     """
     Returns all activations and pre-activations.
     """
-
     activations = [x]
     pre_activations = []
     x = np.array(x, dtype=np.float64)
