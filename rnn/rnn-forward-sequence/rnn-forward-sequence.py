@@ -10,7 +10,7 @@ def rnn_forward(X: np.ndarray, h_0: np.ndarray, W_xh: np.ndarray,
     N, T, D = X.shape
     hidden_states = np.zeros((N, T, H))
     for step in range(T):
-        input_contribution = X[:, step, :]@W_xh.T
+        input_contribution = X[:, step, :]@W_xh.T # (N, D) @ (H, D).T
         recurrent_contribution = h@W_hh.T
     
         h = np.tanh(input_contribution+recurrent_contribution+b_h)
